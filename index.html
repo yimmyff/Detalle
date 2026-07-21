@@ -708,10 +708,10 @@ document.getElementById('audioFile').addEventListener('change', (e)=>{
    CUTE FAN-OF-CARDS GALLERY (upload real photos, doodle placeholders)
 ========================================================= */
 const photoData = [
-    {caption:'Nuestra foto ❤️', emoji:'🧁', words:'HAPPY<br>BIRTHDAY!', confetti:['#ff6b6b','#ffc857','#34e4ea']},
-    {caption:'Otro recuerdo ✨', emoji:'🎈', words:'PARA TI', confetti:['#ff3e9d','#34e4ea','#ffc857']},
-    {caption:'Un momento especial 🌹', emoji:'🐼', words:'FELIZ<br>DÍA', confetti:['#c084fc','#ff6b6b','#34e4ea']},
-    {caption:'Siempre juntos 💕', emoji:'🎉', words:'NATALIA', confetti:['#ffc857','#ff3e9d','#c084fc']}
+    {caption:'Nuestra foto ❤️', src:'foto1.jpg'},
+    {caption:'Otro recuerdo ✨', src:'foto2.jpg'},
+    {caption:'Un momento especial 🌹', src:'foto3.jpg'},
+    {caption:'Siempre juntos 💕', src:'foto4.jpg'}
 ];
 const carousel = document.getElementById('carousel');
 const cdots = document.getElementById('cdots');
@@ -726,13 +726,10 @@ photoData.forEach((p, i)=>{
   const slot = document.createElement('div');
   slot.className = 'photo-slot';
 
-  const art = document.createElement('div');
-  art.className = 'placeholder-art';
-  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para subir tu foto</div>`;
-
   const img = document.createElement('img');
-  img.style.display = 'none';
-  img.alt = '';
+  img.src = p.src;
+  img.style.display = 'block';
+  img.alt = p.caption;
 
   const input = document.createElement('input');
   input.type = 'file';
@@ -742,7 +739,6 @@ photoData.forEach((p, i)=>{
   confetti.className = 'confetti';
   p.confetti.forEach(c=>{ const s=document.createElement('span'); s.style.background=c; confetti.appendChild(s); });
 
-  slot.appendChild(art);
   slot.appendChild(img);
   slot.appendChild(confetti);
 
