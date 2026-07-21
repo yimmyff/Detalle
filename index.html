@@ -748,7 +748,7 @@ photoData.forEach((p, i)=>{
   confetti.className = 'confetti';
   p.confetti.forEach(c=>{ const s=document.createElement('span'); s.style.background=c; confetti.appendChild(s); });
 
-  slot.appendChild(art);
+  
   slot.appendChild(img);
   slot.appendChild(confetti);
 
@@ -758,7 +758,6 @@ photoData.forEach((p, i)=>{
 
   card.appendChild(slot);
   card.appendChild(cap);
-  card.appendChild(input);
   carousel.appendChild(card);
   cardEls.push({card, art, img, input});
 
