@@ -743,9 +743,6 @@ photoData.forEach((p, i)=>{
   img.alt = p.caption;
   img.style.display = 'block';
 
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
 
   const confetti = document.createElement('div');
   confetti.className = 'confetti';
@@ -765,29 +762,16 @@ photoData.forEach((p, i)=>{
   carousel.appendChild(card);
   cardEls.push({card, art, img, input});
 
-  input.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      img.src = reader.result;
-      img.style.display = 'block';
-      art.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-  });
-
-  card.addEventListener('click', ()=>{
-    const delta = deltaFor(i, current, N);
-    if(delta===0){ input.click(); }
-    else { rotateTo(i); }
-  });
 
   const dot = document.createElement('span');
   if(i===0) dot.classList.add('active');
   cdots.appendChild(dot);
 });
-
+  
+card.addEventListener('click', ()=>{
+    rotateTo(i);
+});
+  
 function deltaFor(i, cur, total){
   let d = i - cur;
   if(d > total/2) d -= total;
