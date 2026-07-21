@@ -738,13 +738,10 @@ photoData.forEach((p, i)=>{
   const slot = document.createElement('div');
   slot.className = 'photo-slot';
 
-  const art = document.createElement('div');
-  art.className = 'placeholder-art';
-  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para subir tu foto</div>`;
-
   const img = document.createElement('img');
-  img.style.display = 'none';
-  img.alt = '';
+  img.src = p.image;
+  img.alt = p.caption;
+  img.style.display = 'block';
 
   const input = document.createElement('input');
   input.type = 'file';
