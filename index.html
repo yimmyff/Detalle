@@ -712,7 +712,27 @@ const photoData = [
     {caption:'Otro recuerdo ✨', emoji:'🎈', words:'PARA TI', confetti:['#ff3e9d','#34e4ea','#ffc857']},
     {caption:'Un momento especial 🌹', emoji:'🐼', words:'FELIZ<br>DÍA', confetti:['#c084fc','#ff6b6b','#34e4ea']},
     {caption:'Siempre juntos 💕', emoji:'🎉', words:'NATALIA', confetti:['#ffc857','#ff3e9d','#c084fc']}
+]
+
+  const photoData = [
+    {
+        caption: 'Nuestra foto ❤️',
+        image: 'foto1.jpg'
+    },
+    {
+        caption: 'Otro recuerdo ✨',
+        image: 'foto2.jpg'
+    },
+    {
+        caption: 'Un momento especial 🌹',
+        image: 'foto3.jpg'
+    },
+    {
+        caption: 'Siempre juntos 💕',
+        image: 'foto4.jpg'
+    }
 ];
+  
 const carousel = document.getElementById('carousel');
 const cdots = document.getElementById('cdots');
 const N = photoData.length;
@@ -728,10 +748,14 @@ photoData.forEach((p, i)=>{
 
   const art = document.createElement('div');
   art.className = 'placeholder-art';
-  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para subir tu foto</div>`;
+  // Si tienes imagen, ocultamos el texto de marcador de posición
+  art.style.display = p.imgUrl ? 'none' : 'flex';
+  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para cambiar foto</div>`;
 
   const img = document.createElement('img');
-  img.style.display = 'none';
+  // Asignamos tu imagen por defecto
+  img.src = p.imgUrl || '';
+  img.style.display = p.imgUrl ? 'block' : 'none';
   img.alt = '';
 
   const input = document.createElement('input');
