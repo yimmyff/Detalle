@@ -591,89 +591,47 @@ setInterval(updateCountdown, 1000);
    MUSIC — original synthesized tune (Web Audio API)
    + optional real mp3 upload
 ========================================================= */
-let audioCtx = null;
+const playBtn = document.getElementById("playBtn");
+const bgMusic = document.getElementById("bgMusic");
+
 let isPlaying = false;
-let scheduledTimeouts = [];
-let userAudioEl = null;
 
-const playBtn = document.getElementById('playBtn');
-const audioFileInput = document.getElementById('audioFile');
+playBtn.addEventListener("click", () => {
 
-audioFileInput.addEventListener('change', (e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const url = URL.createObjectURL(file);
-  userAudioEl = new Audio(url);
-  userAudioEl.loop = true;
-  document.querySelector('.music-label').innerHTML = 'Toca para reproducir <b>tu canción</b> 🎵';
-});
+    if (!isPlaying) {
+        bgMusic.play();
+        playBtn.textContent = "❚❚";
+        playBtn.classList.add("playing");
+    } else {
+        bgMusic.pause();
+        playBtn.textContent = "▶";
+        playBtn.classList.remove("playing");
+    }
 
-function playNote(ctxAudio, freq, startTime, duration, gainVal=0.18){
-  const osc = ctxAudio.createOscillator();
-  const gain = ctxAudio.createGain();
-  osc.type = 'triangle';
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0, startTime);
-  gain.gain.linearRampToValueAtTime(gainVal, startTime + 0.03);
-  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-  osc.connect(gain);
-  gain.connect(ctxAudio.destination);
-  osc.start(startTime);
-  osc.stop(startTime + duration + 0.05);
-}
+    isPlaying = !isPlaying;
 
-// A cheerful original melody (not a reproduction of any existing song)
-const MELODY = [
-  ['C5',0.28],['C5',0.28],['D5',0.28],['C5',0.28],['F5',0.28],['E5',0.55],
-  ['C5',0.28],['C5',0.28],['D5',0.28],['C5',0.28],['G5',0.28],['F5',0.55],
-  ['C5',0.28],['C5',0.28],['C6',0.28],['A5',0.28],['F5',0.28],['E5',0.28],['D5',0.55],
-  ['Bb5',0.28],['Bb5',0.28],['A5',0.28],['F5',0.28],['G5',0.28],['F5',0.7],
-];
-const NOTE_FREQ = {C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880.00,Bb5:932.33,C6:1046.50};
-
-function playMelodyLoop(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  const startAt = audioCtx.currentTime + 0.05;
-  let t = startAt;
-  MELODY.forEach(([note,dur])=>{
-    playNote(audioCtx, NOTE_FREQ[note], t, dur*0.92);
-    t += dur;
-  });
-  const totalDur = MELODY.reduce((a,[,d])=>a+d,0);
-  const id = setTimeout(()=>{ if(isPlaying) playMelodyLoop(); }, totalDur*1000);
-  scheduledTimeouts.push(id);
-}
-
-function stopMelody(){
-  scheduledTimeouts.forEach(id=>clearTimeout(id));
-  scheduledTimeouts = [];
-  if(audioCtx){ audioCtx.close(); audioCtx = null; }
-}
-
-playBtn.addEventListener('click', ()=>{
-  isPlaying = !isPlaying;
-  playBtn.classList.toggle('playing', isPlaying);
-  playBtn.textContent = isPlaying ? '❚❚' : '▶';
-
-  if(userAudioEl){
-    if(isPlaying) userAudioEl.play(); else userAudioEl.pause();
-    return;
-  }
-  if(isPlaying){
-    playMelodyLoop();
-  } else {
-    stopMelody();
-  }
 });
 
 /* =========================================================
    3D PHOTO CAROUSEL
 ========================================================= */
 const photoData = [
-  {caption:'Selfie de noche 🌙', hint:'Toca para añadir esta foto'},
-  {caption:'Preparándose para salir ✨', hint:'Toca para añadir esta foto'},
-  {caption:'Entre plantas, sonriendo 🌿', hint:'Toca para añadir esta foto'},
-  {caption:'Ese mismo lindo momento 💚', hint:'Toca para añadir esta foto'},
+    {
+        caption:'Nuestra foto ❤️',
+        image:'foto1.jpg'
+    },
+    {
+        caption:'Otro recuerdo ✨',
+        image:'foto2.jpg'
+    },
+    {
+        caption:'Un momento especial 🌹',
+        image:'foto3.jpg'
+    },
+    {
+        caption:'Siempre juntos 💕',
+        image:'foto4.jpg'
+    }
 ];
 
 const carousel = document.getElementById('carousel');
@@ -690,6 +648,8 @@ photoData.forEach((p, i)=>{
   const slot = document.createElement('label');
   slot.className = 'photo-slot';
   slot.innerHTML = `
+<img src="${p.image}" alt="">
+`;
     <div class="plus">+</div>
     <div class="hint">${p.hint}</div>
     <input type="file" accept="image/*">
@@ -698,17 +658,7 @@ photoData.forEach((p, i)=>{
   cap.className = 'cap';
   cap.textContent = p.caption;
 
-  const input = slot.querySelector('input');
-  input.addEventListener('change', (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const url = URL.createObjectURL(file);
-    const img = document.createElement('img');
-    img.src = url;
-    slot.querySelector('.plus').remove();
-    slot.querySelector('.hint').remove();
-    slot.prepend(img);
-  });
+  
 
   card.appendChild(slot);
   card.appendChild(cap);
