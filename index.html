@@ -707,23 +707,11 @@ document.getElementById('audioFile').addEventListener('change', (e)=>{
 /* =========================================================
    CUTE FAN-OF-CARDS GALLERY (upload real photos, doodle placeholders)
 ========================================================= */
-   const photoData = [
-    {
-        caption: 'Nuestra foto ❤️',
-        image: 'foto1.jpg'
-    },
-    {
-        caption: 'Otro recuerdo ✨',
-        image: 'foto2.jpg'
-    },
-    {
-        caption: 'Un momento especial 🌹',
-        image: 'foto3.jpg'
-    },
-    {
-        caption: 'Siempre juntos 💕',
-        image: 'foto4.jpg'
-    }
+const photoData = [
+    {caption:'Nuestra foto ❤️', emoji:'🧁', words:'HAPPY<br>BIRTHDAY!', confetti:['#ff6b6b','#ffc857','#34e4ea']},
+    {caption:'Otro recuerdo ✨', emoji:'🎈', words:'PARA TI', confetti:['#ff3e9d','#34e4ea','#ffc857']},
+    {caption:'Un momento especial 🌹', emoji:'🐼', words:'FELIZ<br>DÍA', confetti:['#c084fc','#ff6b6b','#34e4ea']},
+    {caption:'Siempre juntos 💕', emoji:'🎉', words:'NATALIA', confetti:['#ffc857','#ff3e9d','#c084fc']}
 ];
 const carousel = document.getElementById('carousel');
 const cdots = document.getElementById('cdots');
@@ -738,17 +726,23 @@ photoData.forEach((p, i)=>{
   const slot = document.createElement('div');
   slot.className = 'photo-slot';
 
-  const img = document.createElement('img');
-  img.src = p.image;
-  img.alt = p.caption;
-  img.style.display = 'block';
+  const art = document.createElement('div');
+  art.className = 'placeholder-art';
+  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para subir tu foto</div>`;
 
+  const img = document.createElement('img');
+  img.style.display = 'none';
+  img.alt = '';
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
 
   const confetti = document.createElement('div');
   confetti.className = 'confetti';
   p.confetti.forEach(c=>{ const s=document.createElement('span'); s.style.background=c; confetti.appendChild(s); });
 
-  
+  slot.appendChild(art);
   slot.appendChild(img);
   slot.appendChild(confetti);
 
@@ -758,19 +752,33 @@ photoData.forEach((p, i)=>{
 
   card.appendChild(slot);
   card.appendChild(cap);
+  card.appendChild(input);
   carousel.appendChild(card);
   cardEls.push({card, art, img, input});
 
+  input.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      img.src = reader.result;
+      img.style.display = 'block';
+      art.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  card.addEventListener('click', ()=>{
+    const delta = deltaFor(i, current, N);
+    if(delta===0){ input.click(); }
+    else { rotateTo(i); }
+  });
 
   const dot = document.createElement('span');
   if(i===0) dot.classList.add('active');
   cdots.appendChild(dot);
 });
-  
-card.addEventListener('click', ()=>{
-    rotateTo(i);
-});
-  
+
 function deltaFor(i, cur, total){
   let d = i - cur;
   if(d > total/2) d -= total;
