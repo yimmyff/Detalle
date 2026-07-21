@@ -158,11 +158,31 @@
     position:absolute; inset:0;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    transition:transform .85s cubic-bezier(.22,.85,.3,1.15), opacity .7s ease, filter .7s ease;
+    transition:transform .8s cubic-bezier(.4,.1,.2,1), opacity .55s ease;
     transform-style:preserve-3d;
+    backface-visibility:hidden;
     will-change:transform,opacity;
   }
   .page::-webkit-scrollbar{width:0;}
+  .page[data-state="active"]{opacity:1; visibility:visible;}
+  .page[data-state="hidden-prev"],.page[data-state="hidden-next"]{opacity:0; visibility:hidden; transition:transform .8s cubic-bezier(.4,.1,.2,1), opacity .55s ease, visibility 0s .8s;}
+  .page[data-state="active"]{transition:transform .8s cubic-bezier(.4,.1,.2,1), opacity .55s ease;}
+
+  /* signature movement per page: WARP (hero) */
+  .page[data-transition="warp"][data-state="active"]{transform:translateZ(0) scale(1);}
+  .page[data-transition="warp"][data-state="hidden-next"]{transform:translateZ(-1500px) scale(.3);}
+  .page[data-transition="warp"][data-state="hidden-prev"]{transform:translateZ(1100px) scale(2.1);}
+
+  /* signature movement per page: FLIP (message, like opening a card) */
+  .page[data-transition="flip"]{transform-origin:left center;}
+  .page[data-transition="flip"][data-state="active"]{transform:rotateY(0deg);}
+  .page[data-transition="flip"][data-state="hidden-next"]{transform:rotateY(-100deg); transform-origin:left center;}
+  .page[data-transition="flip"][data-state="hidden-prev"]{transform:rotateY(100deg); transform-origin:right center;}
+
+  /* signature movement per page: RISE (gallery, cards floating up) */
+  .page[data-transition="rise"][data-state="active"]{transform:translateY(0) scale(1) rotateX(0deg);}
+  .page[data-transition="rise"][data-state="hidden-next"]{transform:translateY(18%) scale(.8) rotateX(18deg);}
+  .page[data-transition="rise"][data-state="hidden-prev"]{transform:translateY(-18%) scale(.8) rotateX(-18deg);}
 
   /* ================= HERO PAGE ================= */
   .hero{
@@ -282,13 +302,30 @@
   .gallery-title .accent{color:var(--cyan);}
   .gallery-sub{font-size:14px; color:var(--cream-dim); max-width:420px; margin:0 auto 46px;}
 
-  .carousel-wrap{position:relative; width:100%; max-width:320px; height:400px; margin:0 auto; perspective:1400px;}
-  .carousel{position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.25,.9,.3,1.2);}
-  .card{position:absolute; inset:0; border-radius:22px; overflow:hidden; backface-visibility:hidden; box-shadow:0 20px 60px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.08);}
-  .card .photo-slot{width:100%;height:100%; display:flex;align-items:center;justify-content:center; flex-direction:column; gap:10px; background:linear-gradient(155deg, #241a52, #120c30); cursor:pointer; position:relative;}
+  .carousel-wrap{position:relative; width:100%; max-width:380px; height:400px; margin:0 auto; perspective:1400px;}
+  .carousel{position:relative; width:100%; height:100%; transform-style:preserve-3d;}
+  .card{
+    position:absolute; left:50%; top:50%;
+    width:216px; height:288px;
+    border-radius:26px;
+    overflow:hidden;
+    background:#fffaf0;
+    border:3px solid #2a2018;
+    box-shadow:0 18px 42px rgba(0,0,0,.5), 0 2px 0 rgba(255,255,255,.4) inset;
+    cursor:pointer;
+    transition:transform .55s cubic-bezier(.25,.9,.3,1.2), opacity .5s ease;
+  }
+  .card .photo-slot{width:100%;height:100%; display:flex;align-items:center;justify-content:center; flex-direction:column; gap:6px; background:#fffaf0; cursor:pointer; position:relative;}
   .card .photo-slot img{position:absolute; inset:0; width:100%;height:100%; object-fit:cover;}
-  .card .cap{position:absolute; left:0; right:0; bottom:0; padding:16px 16px 14px; background:linear-gradient(to top, rgba(5,6,20,.92), transparent); font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.04em; color:var(--cream); text-align:left; z-index:3;}
+  .card .placeholder-art{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:18px; text-align:center;}
+  .card .emoji-big{font-size:56px; line-height:1; filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));}
+  .card .hand-caption{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:19px; color:#2a2018; line-height:1.05; transform:rotate(-2.5deg);}
+  .card .upload-tag{font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.05em; color:#8a7f6c; margin-top:2px;}
+  .card .confetti{position:absolute; left:14px; right:14px; bottom:10px; display:flex; gap:5px; z-index:3;}
+  .card .confetti span{width:11px; height:5px; border-radius:2px; transform:rotate(-6deg);}
+  .card .cap{position:absolute; left:0; right:0; bottom:0; padding:9px 14px 24px; background:linear-gradient(to top, rgba(255,250,240,.95), rgba(255,250,240,0)); font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.03em; color:#2a2018; text-align:center; z-index:2;}
   .card input[type=file]{display:none;}
+  .card.is-side .cap{display:none;}
 
   .carousel-nav{display:flex; justify-content:center; gap:18px; margin-top:26px;}
   .nav-btn{width:42px;height:42px;border-radius:50%; border:1px solid rgba(255,200,87,.4); background:rgba(255,255,255,.04); color:var(--gold); font-size:16px; cursor:pointer; display:flex;align-items:center;justify-content:center; transition:background .2s ease, transform .2s ease;}
@@ -364,7 +401,7 @@
     <div class="page-track" id="pageTrack">
 
       <!-- PAGE 1: HERO -->
-      <section class="page" data-index="0">
+      <section class="page" data-index="0" data-transition="warp">
         <div class="hero">
           <canvas id="fireworks"></canvas>
           <div class="stars"></div>
@@ -383,7 +420,7 @@
       </section>
 
       <!-- PAGE 2: MESSAGE -->
-      <section class="page" data-index="1">
+      <section class="page" data-index="1" data-transition="flip">
         <div class="message-page" id="messagePage">
           <p class="section-eyebrow">Para ti</p>
           <p class="message-card">
@@ -398,10 +435,10 @@
       </section>
 
       <!-- PAGE 3: GALLERY -->
-      <section class="page" data-index="2">
+      <section class="page" data-index="2" data-transition="rise">
         <div class="gallery-page">
           <h2 class="gallery-title">Nuestros <span class="accent">momentos</span></h2>
-          <p class="gallery-sub">Toca cada foto para colocarla en el carrusel. Desliza o usa las flechas para girar.</p>
+          <p class="gallery-sub">Toca la tarjeta del frente para subir tu foto. Desliza, toca los lados o usa las flechas para pasar.</p>
           <div class="carousel-wrap">
             <div class="carousel" id="carousel"></div>
           </div>
@@ -668,47 +705,113 @@ document.getElementById('audioFile').addEventListener('change', (e)=>{
 });
 
 /* =========================================================
-   3D PHOTO CAROUSEL
+   CUTE FAN-OF-CARDS GALLERY (upload real photos, doodle placeholders)
 ========================================================= */
 const photoData = [
-    {caption:'Nuestra foto ❤️', image:'foto1.jpg'},
-    {caption:'Otro recuerdo ✨', image:'foto2.jpg'},
-    {caption:'Un momento especial 🌹', image:'foto3.jpg'},
-    {caption:'Siempre juntos 💕', image:'foto4.jpg'}
+    {caption:'Nuestra foto ❤️', emoji:'🧁', words:'HAPPY<br>BIRTHDAY!', confetti:['#ff6b6b','#ffc857','#34e4ea']},
+    {caption:'Otro recuerdo ✨', emoji:'🎈', words:'PARA TI', confetti:['#ff3e9d','#34e4ea','#ffc857']},
+    {caption:'Un momento especial 🌹', emoji:'🐼', words:'FELIZ<br>DÍA', confetti:['#c084fc','#ff6b6b','#34e4ea']},
+    {caption:'Siempre juntos 💕', emoji:'🎉', words:'NATALIA', confetti:['#ffc857','#ff3e9d','#c084fc']}
 ];
 const carousel = document.getElementById('carousel');
 const cdots = document.getElementById('cdots');
 const N = photoData.length;
-const angleStep = 360/N;
-const radius = 290;
+const cardEls = [];
 
 photoData.forEach((p, i)=>{
   const card = document.createElement('div');
   card.className = 'card';
-  card.style.transform = `rotateY(${i*angleStep}deg) translateZ(${radius}px)`;
-  const slot = document.createElement('label');
+  card.dataset.index = i;
+
+  const slot = document.createElement('div');
   slot.className = 'photo-slot';
-  slot.innerHTML = `<img src="${p.image}" alt="">`;
+
+  const art = document.createElement('div');
+  art.className = 'placeholder-art';
+  art.innerHTML = `<div class="emoji-big">${p.emoji}</div><div class="hand-caption">${p.words}</div><div class="upload-tag">toca para subir tu foto</div>`;
+
+  const img = document.createElement('img');
+  img.style.display = 'none';
+  img.alt = '';
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+
+  const confetti = document.createElement('div');
+  confetti.className = 'confetti';
+  p.confetti.forEach(c=>{ const s=document.createElement('span'); s.style.background=c; confetti.appendChild(s); });
+
+  slot.appendChild(art);
+  slot.appendChild(img);
+  slot.appendChild(confetti);
+
   const cap = document.createElement('div');
   cap.className = 'cap';
   cap.textContent = p.caption;
+
   card.appendChild(slot);
   card.appendChild(cap);
+  card.appendChild(input);
   carousel.appendChild(card);
+  cardEls.push({card, art, img, input});
+
+  input.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      img.src = reader.result;
+      img.style.display = 'block';
+      art.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  card.addEventListener('click', ()=>{
+    const delta = deltaFor(i, current, N);
+    if(delta===0){ input.click(); }
+    else { rotateTo(i); }
+  });
+
   const dot = document.createElement('span');
   if(i===0) dot.classList.add('active');
   cdots.appendChild(dot);
 });
 
+function deltaFor(i, cur, total){
+  let d = i - cur;
+  if(d > total/2) d -= total;
+  if(d < -total/2) d += total;
+  return d;
+}
+
 let current = 0;
+function layoutCards(){
+  cardEls.forEach(({card}, i)=>{
+    const delta = deltaFor(i, current, N);
+    card.classList.toggle('is-side', delta!==0);
+    if(delta===0){
+      card.style.transform = 'translate(-50%,-50%) translateY(0) rotate(0deg) scale(1)';
+      card.style.opacity = '1'; card.style.zIndex = '10'; card.style.pointerEvents='auto';
+    } else if(Math.abs(delta)===1){
+      const dir = delta>0?1:-1;
+      card.style.transform = `translate(-50%,-50%) translate(${dir*128}px, 20px) rotate(${dir*13}deg) scale(.8)`;
+      card.style.opacity = '1'; card.style.zIndex = '5'; card.style.pointerEvents='auto';
+    } else {
+      card.style.transform = 'translate(-50%,-50%) translateY(30px) scale(.55)';
+      card.style.opacity = '0'; card.style.zIndex = '1'; card.style.pointerEvents='none';
+    }
+  });
+  [...cdots.children].forEach((d,i)=> d.classList.toggle('active', i===current));
+}
 function rotateTo(index){
   current = (index + N) % N;
-  carousel.style.transform = `rotateY(${-current*angleStep}deg)`;
-  [...cdots.children].forEach((d,i)=> d.classList.toggle('active', i===current));
+  layoutCards();
 }
 document.getElementById('nextCard').addEventListener('click', ()=> rotateTo(current+1));
 document.getElementById('prevCard').addEventListener('click', ()=> rotateTo(current-1));
-rotateTo(0);
+layoutCards();
 
 let startX = null;
 const cwrap = document.querySelector('.carousel-wrap');
@@ -720,7 +823,7 @@ cwrap.addEventListener('touchend', e=>{
   else if(dx < -40) rotateTo(current+1);
   startX = null;
 });
-let idleTimer = setInterval(()=> rotateTo(current+1), 6000);
+let idleTimer = setInterval(()=> rotateTo(current+1), 6500);
 cwrap.addEventListener('pointerdown', ()=> clearInterval(idleTimer));
 
 /* =========================================================
@@ -745,17 +848,13 @@ pages.forEach((_,i)=>{
 function layoutPages(){
   pages.forEach((page,i)=>{
     const offset = i - currentPage;
-    let tz = offset*-820;
-    let tx = offset*46;
-    let ry = offset*-26;
-    let op = 1;
-    if(offset===0){ tz=0; tx=0; ry=0; op=1; }
-    else if(Math.abs(offset)===1){ op=0.28; }
-    else { op=0; }
-    page.style.transform = `translateZ(${tz}px) translateX(${tx}%) rotateY(${ry}deg)`;
-    page.style.opacity = op;
+    let state;
+    if(offset===0) state = 'active';
+    else if(offset>0) state = 'hidden-next';
+    else state = 'hidden-prev';
+    page.dataset.state = state;
     page.style.pointerEvents = offset===0 ? 'auto' : 'none';
-    page.style.zIndex = 10 - Math.abs(offset);
+    page.style.zIndex = offset===0 ? 10 : 5;
   });
   [...pageDotsEl.children].forEach((d,i)=> d.classList.toggle('active', i===currentPage));
   pageLabelEl.textContent = pageLabels[currentPage];
